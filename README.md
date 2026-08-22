@@ -147,6 +147,10 @@ O executável público não contém OAuth. Cada organização fornece seu própr
 na primeira configuração. Para releases comerciais, avalie assinatura
 Authenticode para reduzir alertas do Windows SmartScreen.
 
+Para publicar uma release no GitHub, crie e envie uma tag no formato `vX.Y.Z`.
+O workflow `Windows release` executa os testes, compila o `.exe`, gera o SHA-256
+e publica também o arquivo ZIP com `LICENSE` e `THIRD_PARTY_NOTICES.md`.
+
 Distribua `LICENSE` e `THIRD_PARTY_NOTICES.md` junto ao `.exe` e conclua o
 [checklist de release](docs/RELEASE_CHECKLIST.md), inclusive a revisão das
 obrigações LGPLv3/GPLv3 ou da licença comercial escolhida para Qt/PySide6.
