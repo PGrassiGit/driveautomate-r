@@ -36,6 +36,10 @@ somente os arquivos escolhidos pelo usuário. Funciona com **Meu Drive**,
 2. No DriveAutomate, clica em **Configurar OAuth** e seleciona o JSON baixado.
 3. Clica em **Adicionar conta** e conclui a autorização no navegador.
 
+O arquivo [`credentials.example.json`](credentials.example.json) é apenas um
+modelo público. Copie-o para um arquivo local, substitua os placeholders pelo
+JSON emitido pelo Google Cloud e nunca publique o arquivo preenchido.
+
 O JSON OAuth e os tokens ficam somente no perfil local do Windows:
 
 ```text

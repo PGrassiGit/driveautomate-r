@@ -51,7 +51,11 @@ def main() -> int:
         if path.suffix.casefold() in FORBIDDEN_ARCHIVE_SUFFIXES:
             findings.append(f"{relative}: arquivo compactado não permitido")
             continue
-        if path.name.casefold().startswith(("credentials", "token")) and path.suffix.casefold() == ".json":
+        if (
+            path.name.casefold().startswith(("credentials", "token"))
+            and path.suffix.casefold() == ".json"
+            and path.name.casefold() != "credentials.example.json"
+        ):
             findings.append(f"{relative}: JSON de credencial/token não permitido")
             continue
         try:

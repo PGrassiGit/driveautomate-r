@@ -12,6 +12,7 @@ htmlcov/
 !.env.example
 token*.json
 credentials*.json
+!credentials.example.json
 oauth_client.json
 accounts/
 *.log
