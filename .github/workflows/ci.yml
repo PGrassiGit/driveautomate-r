@@ -54,7 +54,7 @@ jobs:
           $hash = (Get-FileHash -Algorithm SHA256 .\dist\DriveAutomate.exe).Hash.ToLowerInvariant()
           "$hash *DriveAutomate.exe" | Set-Content -Encoding ascii .\dist\DriveAutomate.exe.sha256
           Get-Content .\dist\DriveAutomate.exe.sha256
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: DriveAutomate-windows
           path: |
