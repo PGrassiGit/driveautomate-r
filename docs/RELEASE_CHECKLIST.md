@@ -2,6 +2,11 @@
 
 Use uma máquina ou runner limpo para cada release pública.
 
+- [ ] No GitHub, revisar descrição, topics, visibilidade, branch principal e
+  habilitar **Private vulnerability reporting**.
+- [ ] Escolher o modelo OAuth (BYO OAuth recomendado para o repositório público)
+  e configurar a tela de consentimento, usuários de teste e publicação no Google
+  Cloud sem commitar o JSON desktop.
 - [ ] Revogar qualquer cliente OAuth que já tenha aparecido em código, binário,
   compactado ou histórico Git.
 - [ ] Executar `python scripts/check_no_secrets.py` e toda a suíte de testes.
@@ -18,6 +23,8 @@ Use uma máquina ou runner limpo para cada release pública.
   exclusão/revogação de dados.
 - [ ] Concluir a verificação OAuth exigida pelo Google para o público e os escopos
   escolhidos.
+- [ ] Substituir o marcador de link em `docs/LINKEDIN_POST.md` pelo URL público e
+  usar somente capturas com dados fictícios.
 - [ ] Assinar com Authenticode quando houver certificado disponível.
 
 Referências oficiais:

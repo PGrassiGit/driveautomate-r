@@ -7,7 +7,8 @@ from unittest.mock import patch
 os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 
 from PySide6.QtCore import QSettings
-from PySide6.QtWidgets import QApplication
+from PySide6.QtGui import QPalette
+from PySide6.QtWidgets import QApplication, QScrollArea
 
 from drive_inventory_gui import DriveAutomateWindow, default_inventory_path
 
@@ -33,10 +34,17 @@ class GuiTests(unittest.TestCase):
                 self.assertEqual(window.tabs.tabText(1), "2. Downloads")
                 self.assertTrue(window.selection_mode.currentData())
                 self.assertFalse(window.cancel_button.isEnabled())
+                self.assertGreaterEqual(window.minimumSize().width(), 980)
+                self.assertIsInstance(window.tabs.widget(0), QScrollArea)
+                self.assertIsInstance(window.tabs.widget(1), QScrollArea)
+                self.assertEqual(
+                    window.palette().color(QPalette.ColorRole.Window).name(), "#111827"
+                )
+                self.assertGreaterEqual(window.folder_input.minimumHeight(), 36)
+                self.assertGreaterEqual(window.download_workbook.minimumHeight(), 36)
             finally:
                 window.close()
 
 
 if __name__ == "__main__":
     unittest.main()
-

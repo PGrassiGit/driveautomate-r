@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased
+
+- Interface com tema escuro, campos dimensionados e abas roláveis para evitar
+  compressão ou sobreposição em janelas menores.
+- Opções de conflito de nomes simplificadas, com explicação acessível no
+  controle de downloads.
+
 ## 3.0.0 — 2026-08-18
 
 - Interface reescrita em PySide6 com workers Qt e cancelamento cooperativo.
