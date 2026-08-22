@@ -16,6 +16,8 @@ Use uma máquina ou runner limpo para cada release pública.
   necessário, reescrever o histórico e invalidar os segredos.
 - [ ] Gerar o `.exe` em ambiente limpo, publicar o SHA-256 e realizar varredura
   antimalware.
+- [ ] Criar uma tag `vX.Y.Z`; o workflow `Windows release` compila, testa e
+  publica automaticamente o executável, o SHA-256 e os avisos de licença.
 - [ ] Distribuir `LICENSE` e `THIRD_PARTY_NOTICES.md` junto ao executável.
 - [ ] Revisar e cumprir LGPLv3/GPLv3 ou usar a licença comercial apropriada para
   Qt/PySide6; confirmar também as licenças dos módulos Qt efetivamente empacotados.
