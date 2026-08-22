@@ -1,0 +1,65 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.12", "3.13"]
+    env:
+      QT_QPA_PLATFORM: offscreen
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+      - name: Install locked dependencies
+        run: python -m pip install -r requirements-lock.txt
+      - name: Check repository for secrets
+        run: python scripts/check_no_secrets.py
+      - name: Run tests
+        run: python -m pytest
+
+  windows-build:
+    runs-on: windows-latest
+    needs: test
+    env:
+      QT_QPA_PLATFORM: offscreen
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: pip
+      - run: python -m pip install -r requirements-lock.txt
+      - run: python -m PyInstaller --noconfirm --clean DriveAutomate.spec
+      - name: CLI smoke test
+        run: .\dist\DriveAutomate.exe --help
+      - name: PySide6 GUI smoke test
+        env:
+          QT_QPA_PLATFORM: offscreen
+        run: .\dist\DriveAutomate.exe --smoke-test-gui
+      - name: SHA-256
+        run: |
+          $hash = (Get-FileHash -Algorithm SHA256 .\dist\DriveAutomate.exe).Hash.ToLowerInvariant()
+          "$hash *DriveAutomate.exe" | Set-Content -Encoding ascii .\dist\DriveAutomate.exe.sha256
+          Get-Content .\dist\DriveAutomate.exe.sha256
+      - uses: actions/upload-artifact@v4
+        with:
+          name: DriveAutomate-windows
+          path: |
+            dist/DriveAutomate.exe
+            dist/DriveAutomate.exe.sha256
+            LICENSE
+            THIRD_PARTY_NOTICES.md
+          if-no-files-found: error
