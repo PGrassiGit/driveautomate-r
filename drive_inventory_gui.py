@@ -9,8 +9,18 @@ import threading
 from pathlib import Path
 from typing import Any, Callable
 
-from PySide6.QtCore import QObject, QSettings, QStandardPaths, QThread, QTimer, QUrl, Signal, Slot
-from PySide6.QtGui import QCloseEvent, QDesktopServices, QFont
+from PySide6.QtCore import (
+    QObject,
+    QSettings,
+    QStandardPaths,
+    QThread,
+    QTimer,
+    QUrl,
+    Qt,
+    Signal,
+    Slot,
+)
+from PySide6.QtGui import QColor, QCloseEvent, QDesktopServices, QFont, QPalette
 from PySide6.QtWidgets import (
     QApplication,
     QCheckBox,
@@ -27,6 +37,8 @@ from PySide6.QtWidgets import (
     QPlainTextEdit,
     QProgressBar,
     QPushButton,
+    QScrollArea,
+    QSizePolicy,
     QTabWidget,
     QVBoxLayout,
     QWidget,
@@ -124,8 +136,11 @@ class DriveAutomateWindow(QMainWindow):
     def __init__(self) -> None:
         super().__init__()
         self.setWindowTitle(f"{APP_TITLE} {APP_VERSION}")
-        self.resize(940, 720)
-        self.setMinimumSize(840, 650)
+        # A área de conteúdo precisa de espaço para os campos e os botões em
+        # telas de 100% de escala. O tamanho mínimo evita que os controles se
+        # sobreponham quando a janela é redimensionada.
+        self.resize(1120, 820)
+        self.setMinimumSize(980, 720)
 
         self.settings = QSettings("DriveAutomate", "DriveAutomate")
         self.accounts: list[Path] = []
@@ -172,25 +187,40 @@ class DriveAutomateWindow(QMainWindow):
         account_card.setObjectName("card")
         account_layout = QGridLayout(account_card)
         account_layout.setContentsMargins(16, 14, 16, 14)
+        account_layout.setHorizontalSpacing(10)
+        account_layout.setVerticalSpacing(8)
         account_layout.addWidget(QLabel("Conta Google ativa"), 0, 0)
         self.account_combo = QComboBox()
+        self.account_combo.setMinimumWidth(260)
+        self.account_combo.setMinimumHeight(36)
+        self.account_combo.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
         self.account_combo.currentIndexChanged.connect(self._account_changed)
-        account_layout.addWidget(self.account_combo, 0, 1)
+        # A conta ocupa uma linha inteira; os três botões ficam abaixo. Isso
+        # evita que a grade comprima a combo e faça os controles se cobrirem
+        # em janelas menores.
+        account_layout.addWidget(self.account_combo, 0, 1, 1, 4)
         self.add_account_button = QPushButton("Adicionar conta")
+        self.add_account_button.setMinimumWidth(138)
         self.add_account_button.clicked.connect(self.start_add_account)
-        account_layout.addWidget(self.add_account_button, 0, 2)
         self.remove_account_button = QPushButton("Remover conta")
+        self.remove_account_button.setMinimumWidth(126)
         self.remove_account_button.clicked.connect(self.remove_account)
-        account_layout.addWidget(self.remove_account_button, 0, 3)
         self.oauth_button = QPushButton("Configurar OAuth")
+        self.oauth_button.setMinimumWidth(138)
         self.oauth_button.clicked.connect(self.configure_oauth)
-        account_layout.addWidget(self.oauth_button, 0, 4)
+        account_actions = QHBoxLayout()
+        account_actions.setSpacing(10)
+        account_actions.addStretch()
+        account_actions.addWidget(self.add_account_button)
+        account_actions.addWidget(self.remove_account_button)
+        account_actions.addWidget(self.oauth_button)
+        account_layout.addLayout(account_actions, 1, 0, 1, 5)
         self.account_status = QLabel()
         self.account_status.setObjectName("muted")
-        account_layout.addWidget(self.account_status, 1, 0, 1, 3)
+        account_layout.addWidget(self.account_status, 2, 0, 1, 3)
         self.oauth_status = QLabel()
         self.oauth_status.setObjectName("muted")
-        account_layout.addWidget(self.oauth_status, 1, 3, 1, 2)
+        account_layout.addWidget(self.oauth_status, 2, 3, 1, 2)
         account_layout.setColumnStretch(1, 1)
         layout.addWidget(account_card)
 
@@ -260,6 +290,7 @@ class DriveAutomateWindow(QMainWindow):
 
     def _build_inventory_tab(self) -> QWidget:
         tab = QWidget()
+        tab.setMinimumHeight(390)
         layout = QVBoxLayout(tab)
         layout.setContentsMargins(18, 18, 18, 18)
         layout.setSpacing(14)
@@ -273,17 +304,29 @@ class DriveAutomateWindow(QMainWindow):
 
         form = QFormLayout()
         form.setSpacing(12)
+        form.setFieldGrowthPolicy(QFormLayout.FieldGrowthPolicy.ExpandingFieldsGrow)
+        form.setLabelAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
         self.folder_input = QLineEdit()
+        self.folder_input.setMinimumWidth(460)
+        self.folder_input.setMinimumHeight(36)
+        self.folder_input.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
         self.folder_input.setPlaceholderText("https://drive.google.com/drive/folders/...")
         form.addRow("Pasta do Google Drive", self.folder_input)
 
-        output_row = QHBoxLayout()
+        output_container = QWidget()
+        output_container.setMinimumHeight(50)
+        output_row = QHBoxLayout(output_container)
+        output_row.setContentsMargins(0, 0, 0, 0)
         self.inventory_output = QLineEdit(str(default_inventory_path()))
+        self.inventory_output.setMinimumWidth(460)
+        self.inventory_output.setMinimumHeight(36)
+        self.inventory_output.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
         output_row.addWidget(self.inventory_output, 1)
         choose_output = QPushButton("Escolher…")
+        choose_output.setMinimumWidth(112)
         choose_output.clicked.connect(self.choose_inventory_output)
         output_row.addWidget(choose_output)
-        form.addRow("Salvar inventário em", output_row)
+        form.addRow("Salvar inventário em", output_container)
         layout.addLayout(form)
 
         hint = QLabel(
@@ -309,10 +352,11 @@ class DriveAutomateWindow(QMainWindow):
         self.action_widgets.extend(
             [self.folder_input, self.inventory_output, choose_output, self.test_access_button, self.export_button]
         )
-        return tab
+        return self._scrollable_tab(tab)
 
     def _build_download_tab(self) -> QWidget:
         tab = QWidget()
+        tab.setMinimumHeight(430)
         layout = QVBoxLayout(tab)
         layout.setContentsMargins(18, 18, 18, 18)
         layout.setSpacing(14)
@@ -326,34 +370,60 @@ class DriveAutomateWindow(QMainWindow):
 
         form = QFormLayout()
         form.setSpacing(12)
-        excel_row = QHBoxLayout()
+        form.setFieldGrowthPolicy(QFormLayout.FieldGrowthPolicy.ExpandingFieldsGrow)
+        form.setLabelAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
+        excel_container = QWidget()
+        excel_container.setMinimumHeight(50)
+        excel_row = QHBoxLayout(excel_container)
+        excel_row.setContentsMargins(0, 0, 0, 0)
         self.download_workbook = QLineEdit()
+        self.download_workbook.setMinimumWidth(460)
+        self.download_workbook.setMinimumHeight(36)
+        self.download_workbook.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
         self.download_workbook.setPlaceholderText("Selecione o inventário .xlsx")
         excel_row.addWidget(self.download_workbook, 1)
         choose_excel = QPushButton("Escolher…")
+        choose_excel.setMinimumWidth(112)
         choose_excel.clicked.connect(self.choose_download_workbook)
         excel_row.addWidget(choose_excel)
-        form.addRow("Planilha de seleção", excel_row)
+        form.addRow("Planilha de seleção", excel_container)
 
-        folder_row = QHBoxLayout()
+        folder_container = QWidget()
+        folder_container.setMinimumHeight(50)
+        folder_row = QHBoxLayout(folder_container)
+        folder_row.setContentsMargins(0, 0, 0, 0)
         self.download_destination = QLineEdit(str(default_downloads_dir() / "DriveAutomate"))
+        self.download_destination.setMinimumWidth(460)
+        self.download_destination.setMinimumHeight(36)
+        self.download_destination.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
         folder_row.addWidget(self.download_destination, 1)
         choose_folder = QPushButton("Escolher…")
+        choose_folder.setMinimumWidth(112)
         choose_folder.clicked.connect(self.choose_download_destination)
         folder_row.addWidget(choose_folder)
-        form.addRow("Salvar arquivos em", folder_row)
+        form.addRow("Salvar arquivos em", folder_container)
 
         self.selection_mode = QComboBox()
+        self.selection_mode.setMinimumHeight(36)
         self.selection_mode.addItem("Somente linhas marcadas como Sim (recomendado)", True)
         self.selection_mode.addItem("Todos os arquivos restantes na planilha", False)
         form.addRow("Modo de seleção", self.selection_mode)
 
         self.skip_existing = QCheckBox(
-            "Pular arquivos que já existem (desmarcado: criar outro nome)"
+            "Pular arquivos existentes"
+        )
+        self.skip_existing.setMinimumHeight(32)
+        self.skip_existing.setToolTip(
+            "Desmarcado: arquivos com o mesmo nome serão salvos com um novo nome."
         )
         self.skip_existing.setChecked(True)
         form.addRow("Conflitos", self.skip_existing)
         layout.addLayout(form)
+
+        conflict_hint = QLabel("Desmarque para criar outro nome quando já existir um arquivo.")
+        conflict_hint.setObjectName("muted")
+        conflict_hint.setWordWrap(True)
+        layout.addWidget(conflict_hint)
 
         warning = QLabel(
             "Arquivos Google Workspace são convertidos automaticamente. Arquivos grandes "
@@ -387,30 +457,63 @@ class DriveAutomateWindow(QMainWindow):
                 self.download_button,
             ]
         )
-        return tab
+        return self._scrollable_tab(tab)
+
+    @staticmethod
+    def _scrollable_tab(content: QWidget) -> QScrollArea:
+        scroll = QScrollArea()
+        scroll.setObjectName("tabScrollArea")
+        scroll.setFrameShape(QFrame.Shape.NoFrame)
+        scroll.setWidgetResizable(True)
+        scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        scroll.setWidget(content)
+        return scroll
 
     def _apply_style(self) -> None:
+        app = QApplication.instance()
+        if app is not None:
+            app.setStyle("Fusion")
+            palette = QPalette()
+            palette.setColor(QPalette.ColorRole.Window, QColor("#111827"))
+            palette.setColor(QPalette.ColorRole.WindowText, QColor("#E5E7EB"))
+            palette.setColor(QPalette.ColorRole.Base, QColor("#111827"))
+            palette.setColor(QPalette.ColorRole.AlternateBase, QColor("#1F2937"))
+            palette.setColor(QPalette.ColorRole.Text, QColor("#E5E7EB"))
+            palette.setColor(QPalette.ColorRole.Button, QColor("#374151"))
+            palette.setColor(QPalette.ColorRole.ButtonText, QColor("#F3F4F6"))
+            palette.setColor(QPalette.ColorRole.Highlight, QColor("#155E75"))
+            palette.setColor(QPalette.ColorRole.HighlightedText, QColor("#F8FAFC"))
+            palette.setColor(QPalette.ColorRole.ToolTipBase, QColor("#1F2937"))
+            palette.setColor(QPalette.ColorRole.ToolTipText, QColor("#F3F4F6"))
+            app.setPalette(palette)
+            self.setPalette(palette)
         self.setFont(QFont("Segoe UI", 10))
         self.setStyleSheet(
             """
-            QMainWindow { background: #F4F7FA; }
-            QLabel#appTitle { font-size: 26px; font-weight: 700; color: #153B5B; }
-            QLabel#subtitle, QLabel#muted { color: #64748B; }
-            QLabel#versionBadge { background: #E0F2FE; color: #075985; padding: 5px 9px; border-radius: 9px; font-weight: 600; }
-            QLabel#hint { background: #FFF7D6; color: #7C5A00; padding: 10px; border-radius: 6px; }
-            QLabel#statusLabel { color: #334155; font-weight: 600; }
-            QFrame#card { background: white; border: 1px solid #D9E2EC; border-radius: 9px; }
-            QTabWidget::pane { background: white; border: 1px solid #D9E2EC; border-radius: 8px; }
-            QTabBar::tab { background: #E9EFF5; padding: 10px 20px; color: #1EBEF0; }
-            QTabBar::tab:selected { background: #DCE7EF; color: #127391; font-weight: 700; }
-            QLineEdit, QComboBox, QPlainTextEdit { background: white; border: 1px solid #CBD5E1; border-radius: 6px; padding: 7px; }
-            QPushButton { background: #E9EFF5; color: #1E3A4C; border: 1px solid #CBD5E1; border-radius: 6px; padding: 8px 13px; }
-            QPushButton:hover { background: #DCE7EF; }
-            QPushButton:disabled { color: #94A3B8; background: #F1F5F9; }
-            QPushButton#primaryButton { background: #0F766E; color: white; border: none; font-weight: 700; }
-            QPushButton#primaryButton:hover { background: #115E59; }
-            QProgressBar { border: 1px solid #CBD5E1; border-radius: 5px; text-align: center; background: white; }
+            QMainWindow, QWidget { background: #111827; color: #E5E7EB; }
+            QLabel#appTitle { font-size: 26px; font-weight: 700; color: #F8FAFC; }
+            QLabel#subtitle, QLabel#muted { color: #94A3B8; }
+            QLabel#versionBadge { background: #1E3A5F; color: #93C5FD; padding: 5px 9px; border-radius: 9px; font-weight: 600; }
+            QLabel#hint { background: #243447; color: #BAE6FD; padding: 10px; border: 1px solid #155E75; border-radius: 6px; }
+            QLabel#statusLabel { color: #CBD5E1; font-weight: 600; }
+            QFrame#card { background: #1F2937; border: 1px solid #374151; border-radius: 10px; }
+            QTabWidget::pane { background: #1F2937; border: 1px solid #374151; border-radius: 8px; top: -1px; }
+            QTabBar::tab { background: #111827; color: #94A3B8; padding: 11px 18px; border: 1px solid #374151; border-bottom: none; }
+            QTabBar::tab:selected { background: #1F2937; color: #67E8F9; font-weight: 700; }
+            QLineEdit, QComboBox, QPlainTextEdit { background: #111827; color: #E5E7EB; border: 1px solid #4B5563; border-radius: 6px; padding: 7px; selection-background-color: #155E75; }
+            QLineEdit:focus, QComboBox:focus, QPlainTextEdit:focus { border: 1px solid #22D3EE; }
+            QComboBox QAbstractItemView { background: #1F2937; color: #E5E7EB; selection-background-color: #155E75; selection-color: #F8FAFC; border: 1px solid #4B5563; }
+            QPushButton { background: #374151; color: #F3F4F6; border: 1px solid #4B5563; border-radius: 6px; min-height: 34px; padding: 7px 14px; }
+            QPushButton:hover { background: #4B5563; }
+            QPushButton:pressed { background: #155E75; }
+            QPushButton:disabled { color: #6B7280; background: #1F2937; border-color: #374151; }
+            QPushButton#primaryButton { background: #0F766E; color: #F0FDFA; border: 1px solid #14B8A6; font-weight: 700; }
+            QPushButton#primaryButton:hover { background: #0D9488; }
+            QCheckBox { spacing: 8px; color: #E5E7EB; }
+            QCheckBox::indicator { width: 16px; height: 16px; }
+            QProgressBar { border: 1px solid #4B5563; border-radius: 5px; text-align: center; color: #E5E7EB; background: #111827; }
             QProgressBar::chunk { background: #0F766E; border-radius: 4px; }
+            QToolTip { background: #1F2937; color: #F3F4F6; border: 1px solid #4B5563; padding: 5px; }
             """
         )
 
