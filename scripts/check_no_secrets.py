@@ -15,6 +15,7 @@ FORBIDDEN_ARCHIVE_SUFFIXES = {".zip", ".7z", ".rar"}
 # As expressões são montadas em partes para o scanner não acusar a própria fonte.
 PATTERNS = {
     "Google OAuth client secret": re.compile((b"GOC" + b"SPX-[A-Za-z0-9_-]{20,}")),
+    "Google API key": re.compile((b"AI" + b"za[0-9A-Za-z_-]{35}")),
     "Google OAuth client ID real": re.compile(
         b"[0-9]{6,}-[a-z0-9_-]{20,}\\.apps\\.googleusercontent\\.com",
         re.IGNORECASE,

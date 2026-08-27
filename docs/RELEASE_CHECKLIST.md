@@ -4,6 +4,10 @@ Use uma máquina ou runner limpo para cada release pública.
 
 - [ ] No GitHub, revisar descrição, topics, visibilidade, branch principal e
   habilitar **Private vulnerability reporting**.
+- [ ] Depois de tornar o repositório público, confirmar que os workflows **CI** e
+  **CodeQL** terminam com sucesso. Em repositório privado, CodeQL exige GitHub
+  Code Security e a variável de repositório `CODEQL_PRIVATE_ENABLED=true`; o job
+  permanece ignorado sem essa configuração.
 - [ ] Escolher o modelo OAuth (BYO OAuth recomendado para o repositório público)
   e configurar a tela de consentimento, usuários de teste e publicação no Google
   Cloud sem commitar o JSON desktop.
