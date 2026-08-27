@@ -29,8 +29,6 @@ Use uma máquina ou runner limpo para cada release pública.
   exclusão/revogação de dados.
 - [ ] Concluir a verificação OAuth exigida pelo Google para o público e os escopos
   escolhidos.
-- [ ] Substituir o marcador de link em `docs/LINKEDIN_POST.md` pelo URL público e
-  usar somente capturas com dados fictícios.
 - [ ] Assinar com Authenticode quando houver certificado disponível.
 
 Referências oficiais:

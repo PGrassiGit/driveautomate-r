@@ -7,6 +7,8 @@
   público.
 - Workflows atualizados para as versões atuais das actions de checkout, Python e
   CodeQL.
+- Dependências travadas e actions oficiais atualizadas para as versões validadas
+  mais recentes antes da publicação do repositório.
 - Smoke tests do executável agora aguardam os processos e validam seus códigos de
   saída, com timeout para impedir falsos resultados positivos no CI.
 - Scanner de segredos ampliado para detectar também chaves de API do Google.
