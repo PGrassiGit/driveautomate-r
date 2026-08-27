@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+- CodeQL atualizado e configurado para não falhar enquanto o repositório privado
+  não tiver GitHub Code Security; a análise inicia automaticamente ao torná-lo
+  público.
+- Workflows atualizados para as versões atuais das actions de checkout, Python e
+  CodeQL.
+- Smoke tests do executável agora aguardam os processos e validam seus códigos de
+  saída, com timeout para impedir falsos resultados positivos no CI.
+- Scanner de segredos ampliado para detectar também chaves de API do Google.
+- Metadados de licença ajustados para builds com versões atuais do setuptools.
 - Interface com tema escuro, campos dimensionados e abas roláveis para evitar
   compressão ou sobreposição em janelas menores.
 - Opções de conflito de nomes simplificadas, com explicação acessível no

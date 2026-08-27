@@ -15,9 +15,9 @@ jobs:
       QT_QPA_PLATFORM: offscreen
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: "3.13"
           cache: pip
@@ -35,9 +35,7 @@ jobs:
         run: python -m PyInstaller --noconfirm --clean DriveAutomate.spec
 
       - name: Smoke test executable
-        run: |
-          .\dist\DriveAutomate.exe --help
-          .\dist\DriveAutomate.exe --smoke-test-gui
+        run: .\scripts\smoke_test_exe.ps1
 
       - name: Prepare release files
         shell: pwsh

@@ -6,6 +6,7 @@ set QT_QPA_PLATFORM=offscreen
 python -m pytest -q || exit /b 1
 set QT_QPA_PLATFORM=
 python -m PyInstaller --noconfirm --clean DriveAutomate.spec || exit /b 1
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts\smoke_test_exe.ps1 || exit /b 1
 echo Executavel gerado em: dist\DriveAutomate.exe
 certutil -hashfile dist\DriveAutomate.exe SHA256
 endlocal

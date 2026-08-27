@@ -6,6 +6,7 @@ $env:QT_QPA_PLATFORM = "offscreen"
 python -m pytest -q
 Remove-Item Env:QT_QPA_PLATFORM -ErrorAction SilentlyContinue
 python -m PyInstaller --noconfirm --clean DriveAutomate.spec
+.\scripts\smoke_test_exe.ps1
 
 Write-Host "Executável gerado em: dist\DriveAutomate.exe"
 Get-FileHash -Algorithm SHA256 "dist\DriveAutomate.exe"
