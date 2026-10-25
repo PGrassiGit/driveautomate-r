@@ -1,7 +1,7 @@
 # Dependências exatas validadas em Windows (Python 3.11 e 3.13).
 # Atualize de forma deliberada e execute testes + build após cada alteração.
 altgraph==0.17.5
-certifi==2025.8.3
+certifi==2026.10.19
 cffi==2.0.0
 charset-normalizer==3.5.1
 colorama==0.4.6
